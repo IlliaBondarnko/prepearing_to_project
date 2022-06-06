@@ -1,5 +1,5 @@
-# from datetime import datetime
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
+from datetime import datetime
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, ConversationHandler
 from telegram import KeyboardButton, ReplyKeyboardMarkup
 
 
@@ -10,16 +10,25 @@ updater = Updater(TOKEN)
 
 def start(update, context):
     chat = update.effective_chat
-    buttons = [[KeyboardButton('make a note')], [KeyboardButton('dear diary')], [KeyboardButton('history of my dairy')], 
-    [KeyboardButton('check notes')]]
+    buttons = [[KeyboardButton('/make_a_note')]]
     context.bot.send_message(chat_id=chat.id, text="""Hi there! 
     \nI can show you chenges of currency rate during the year.
     \n let's start!""", reply_markup=ReplyKeyboardMarkup(buttons))
 
 
+def cancel(update):
+    update.message.reply_text(
+        'Name Conversation cancelled by user. Bye. Send /set_name to start again')
+    return ConversationHandler.END
+
+
+def date_and_time():
+    current_date = datetime.now.strftime("%m.%d.%Y")
+    return current_date
+
 def functional(update, context):
     mode = update.message.text
-    if mode == 'make a note':
+    if mode == '/make_a_note':
         addnote(update, context)
 
 
@@ -32,9 +41,7 @@ def saver(new_note):
     except FileNotFoundError:
         with open("notes.txt", 'w') as f:
             f.write("-"+new_note)
-    
-                
-
+                   
 
 def addnote(update, context):
     chat = update.effective_chat
@@ -46,10 +53,25 @@ def addnote(update, context):
     well done!""")
 
 
-
 disp = updater.dispatcher
-disp.add_handler(CommandHandler('start', start))
-disp.add_handler(MessageHandler(Filters.all, functional))
+
+
+_handlers = {}
+
+_handlers['start'] = CommandHandler('start', start)
+
+_handlers['make_a_note'] = ConversationHandler(
+    entry_points=[CommandHandler('start', start)],
+    states={
+        "note": [MessageHandler(Filters.text, addnote)]
+    },
+    fallbacks=[CommandHandler('cancel', cancel)]
+)
+
+
+for name, _handler in _handlers.items():
+    print(f'Adding handler {name}')
+    disp.add_handler(_handler)
 
 
 updater.start_polling()
