@@ -10,11 +10,12 @@ updater = Updater(TOKEN)
 
 def start(update, context):
     chat = update.effective_chat
-    buttons = [[KeyboardButton('/make_a_note')]]
+    buttons = [[KeyboardButton('make_a_note')]]
     context.bot.send_message(chat_id=chat.id, text="""Hi there! 
     \nI can show you chenges of currency rate during the year.
     \n let's start!""", reply_markup=ReplyKeyboardMarkup(buttons))
-
+    return 1
+    
 
 def cancel(update):
     update.message.reply_text(
@@ -26,9 +27,10 @@ def date_and_time():
     current_date = datetime.now.strftime("%m.%d.%Y")
     return current_date
 
+
 def functional(update, context):
     mode = update.message.text
-    if mode == '/make_a_note':
+    if mode == 'make_a_note':
         addnote(update, context)
 
 
@@ -51,28 +53,19 @@ def addnote(update, context):
     saver(new_note) 
     context.bot.send_message(chat_id=chat.id, text="""
     well done!""")
+    return ConversationHandler.END
 
 
-disp = updater.dispatcher
-
-
-_handlers = {}
-
-_handlers['start'] = CommandHandler('start', start)
-
-_handlers['make_a_note'] = ConversationHandler(
+handler = CommandHandler(
     entry_points=[CommandHandler('start', start)],
     states={
-        "note": [MessageHandler(Filters.text, addnote)]
+            1: [MessageHandler(Filters.text, addnote)],
     },
     fallbacks=[CommandHandler('cancel', cancel)]
 )
 
 
-for name, _handler in _handlers.items():
-    print(f'Adding handler {name}')
-    disp.add_handler(_handler)
-
-
+disp = updater.dispatcher
+disp.add_handler(handler)
 updater.start_polling()
 updater.idle()
