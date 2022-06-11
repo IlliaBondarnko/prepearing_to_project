@@ -39,10 +39,15 @@ def saver(new_note):
             f.write("-"+str(new_note))
                    
 
-def addnote(update, context):
+def first_addnote(update, context):
     chat = update.effective_chat
     context.bot.send_message(chat_id=chat.id, text="""
     okay, write down a note!)""")
+    return 2
+
+    
+def second_addnote(update, context):
+    chat = update.effective_chat    
     new_note = str(context.user_data)
     saver(new_note) 
     context.bot.send_message(chat_id=chat.id, text="""
@@ -53,7 +58,8 @@ def addnote(update, context):
 handler = ConversationHandler(
     entry_points=[CommandHandler('start', start)],
     states={
-            1: [MessageHandler(Filters.text, addnote)],
+            1: [MessageHandler(Filters.text, first_addnote)],
+            2: [MessageHandler(Filters.text, second_addnote)]
     },
     fallbacks=[CommandHandler('cancel', cancel)]
 )
