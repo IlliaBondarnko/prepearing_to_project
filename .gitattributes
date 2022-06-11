@@ -48,7 +48,7 @@ def first_addnote(update, context):
     
 def second_addnote(update, context):
     chat = update.effective_chat    
-    new_note = str(context.user_data)
+    new_note = str(update.message.text)
     saver(new_note) 
     context.bot.send_message(chat_id=chat.id, text="""
     well done!""")
