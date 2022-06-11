@@ -10,12 +10,11 @@ updater = Updater(TOKEN)
 
 def start(update, context):
     chat = update.effective_chat
-    buttons = [[KeyboardButton('make a note')]]
+    buttons = [[KeyboardButton('make_a_note')]]
     context.bot.send_message(chat_id=chat.id, text="""Hi there! 
-    \nI can show you chenges of currency rate during the year.
+    \ni'm your friend, so you may entrust me the most secret things ;)
     \n let's start!""", reply_markup=ReplyKeyboardMarkup(buttons))
-    return 1
-    
+
 
 def cancel(update):
     update.message.reply_text(
@@ -43,7 +42,7 @@ def first_addnote(update, context):
     chat = update.effective_chat
     context.bot.send_message(chat_id=chat.id, text="""
     okay, write down a note!)""")
-    return 2
+    return 1
 
     
 def second_addnote(update, context):
@@ -56,10 +55,9 @@ def second_addnote(update, context):
 
 
 handler = ConversationHandler(
-    entry_points=[CommandHandler('start', start)],
+    entry_points=[CommandHandler('make_a_note', first_addnote)],
     states={
-            1: [MessageHandler(Filters.text, first_addnote)],
-            2: [MessageHandler(Filters.text, second_addnote)]
+            1: [MessageHandler(Filters.text, second_addnote)]
     },
     fallbacks=[CommandHandler('cancel', cancel)]
 )
@@ -67,5 +65,6 @@ handler = ConversationHandler(
 
 disp = updater.dispatcher
 disp.add_handler(handler)
+disp.add_handler(CommandHandler("start", start))
 updater.start_polling()
 updater.idle()
