@@ -20,13 +20,23 @@ def start(update, context):
     buttons = [
         [KeyboardButton('/make_a_note')],
         [KeyboardButton('/check_my_notes')],
-        [KeyboardButton('/delete_the_note')]
+        [KeyboardButton('/delete_the_note')],
+        [KeyboardButton('/menu')]
         ]
     context.bot.send_message(chat_id=chat.id, text="""Hi there! 
     \ni'm your friend, so you may entrust me the most secret things 😜
-    \nI would be glad to listen to you 😄""", reply_markup=ReplyKeyboardMarkup(buttons))
+    \nI would be glad to listen to you 😄""",
+    reply_markup=ReplyKeyboardMarkup(buttons))
+    menu(update, context)
 
-
+def menu(update, context):
+    chat = update.effective_chat
+    context.bot.send_message(chat_id=chat.id, text="""
+     - for creating a note tap on the button 😁👉 "/make_a_note",
+     \n - for viewing notes tap on the button 😸👉 "/check_my_notes",
+     \n - for deleting a note tap on the button 😈👉 "/delete_the_note",
+     \n - for viewing this menu tap on the button 😉👉 "/menu"
+     """)
 #_________________________________________________________________________________________
 #_________WORKING WITH MEMORY_____________________________________________________________
 
@@ -94,16 +104,20 @@ def checking_the_notes(update, context):
     try:
         with open("notes.json") as f:
             data = json.load(f)
-            context.bot.send_message(chat_id=chat.id, text="""
-            __________________""")
-            for i in data:
-                all_notes = i["note"]
-                context.bot.send_message(chat_id=chat.id, text="- " + f"{ all_notes}")
-            context.bot.send_message(chat_id=chat.id, text="""
-            __________________""")
+            if data == [] or data == '':
+                context.bot.send_message(chat_id=chat.id, text="""
+            you have added nothing yet😅""")
+            else:
+                context.bot.send_message(chat_id=chat.id, text="""
+                __________________""")
+                for i in data:
+                    all_notes = i["note"]
+                    context.bot.send_message(chat_id=chat.id, text="- " + f"{all_notes}")
+                context.bot.send_message(chat_id=chat.id, text="""
+                __________________""")
     except FileNotFoundError:
         context.bot.send_message(chat_id=chat.id, text="""
-        you haven't added any notes yet""")
+        you have added nothing yet😅""")
 
 
 def first_deleter(update, context):
@@ -122,7 +136,7 @@ def second_deleter(update, context):
     chat = update.effective_chat
     note = str(update.message.text)
     verifying = note.replace(" ", "")
-    if verifying.isalnum() == True:
+    if verifying.isalpha() == True:
         try:
             with open("notes.json") as f:
                 data = list(json.load(f))
@@ -136,9 +150,22 @@ def second_deleter(update, context):
         except FileNotFoundError:
             context.bot.send_message(chat_id=chat.id, text="""
             you have added nothing yet😅""")
-    else:
-        context.bot.send_message(chat_id=chat.id, text="""
-            something went wrong😅""")
+    elif verifying.isdigit() == True:
+        try:
+            with open("notes.json") as f:
+                data = list(json.load(f))
+                ind = int(note) - 1
+                data.pop(ind)
+            with open("notes.json", "w") as f:            
+                json.dump(data, f, indent=3)
+            context.bot.send_message(chat_id=chat.id, text="""
+    well done!👍""")
+        except FileNotFoundError:
+            context.bot.send_message(chat_id=chat.id, text="""
+            you have added nothing yet😅""")
+        except IndexError:
+            context.bot.send_message(chat_id=chat.id, text="""
+            there is not such number of note😅""")
     return ConversationHandler.END
 
     
@@ -173,6 +200,8 @@ disp.add_handler(adding_handler)
 disp.add_handler(deleting_handler)
 disp.add_handler(CommandHandler("start", start))
 disp.add_handler(CommandHandler("check_my_notes", checking_the_notes))
+disp.add_handler(CommandHandler("menu", menu))
+disp.add_handler(CommandHandler("start", menu))
 updater.start_polling()
 updater.idle()
 #_________________________________________________________________________________________
