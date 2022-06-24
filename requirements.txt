@@ -1,0 +1,7 @@
+# To update, run:
+#
+#    pip-compile
+
+ PACKAGE                  VERSION
+_____________________________________
+python-telegram-bot       13.11
