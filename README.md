@@ -1,10 +1,10 @@
- before starting it you have to install packages: datetime, telegram.ext, telegram.
-
-
-for example:
-    write into the console -> pip install datetime
-                                                      etc...
-    
+  1. before starting it you have to install datetime module, telegram.ext package and python-telegram-bot package
+     for example:
+         write into the console -> pip install datetime
+                                                         etc...
+  2. then put the code into your python environment
+  3. change the TOKEN to yours
+  4. run it
     ___________________________________________________________
     WHAT IS IT?
     this is a telegram-bot, that consideres itself as a notebook.
