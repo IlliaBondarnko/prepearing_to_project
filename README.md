@@ -5,7 +5,7 @@
   2. then put the code into your python environment
   3. change the TOKEN to yours
   4. run it
-    ___________________________________________________________
+___________________________________________________________
     WHAT IS IT?
     this is a telegram-bot, that consideres itself as a notebook.
     it creates 4 buttons:
